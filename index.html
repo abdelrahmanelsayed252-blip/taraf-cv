@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CV عاملات ترف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Tajawal:wght@700;800&display=swap">
+<style>
+/* Layout: tool page — live CV preview beside (desktop) or above (phone) a short RTL form; Taraf plum + gold */
+:root{
+  --bg:#F4EFF2; --surface:#FFFFFF; --surface-2:#F8F4F6; --ink:#2A0F20; --muted:#6E5966; --line:#E2D5DC;
+  --accent:#5A1E44; --accent-ink:#FFFFFF; --sun:#F6B419; --warn:#B4541A; --focus:#5A1E44;
+  --ui:"IBM Plex Sans Arabic", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#140A10; --surface:#1E1018; --surface-2:#26151F; --ink:#F1E6EC; --muted:#B39CA9; --line:#3C2532;
+  --accent:#D59BC0; --accent-ink:#22091A; --sun:#F6B419; --warn:#F0965A; --focus:#E3B2D1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#140A10; --surface:#1E1018; --surface-2:#26151F; --ink:#F1E6EC; --muted:#B39CA9; --line:#3C2532;
+  --accent:#D59BC0; --accent-ink:#22091A; --sun:#F6B419; --warn:#F0965A; --focus:#E3B2D1; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.6}
+.wrap{direction:rtl;max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:1.35rem;margin:0;font-weight:700;text-wrap:balance}
+header p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:22px;align-items:start}
+.preview{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:12px;min-width:0}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px}
+canvas#cv{display:block;width:100%;height:auto;border-radius:6px;touch-action:none;cursor:grab}
+canvas#cv.drag{cursor:grabbing}
+.hint{font-size:.82rem;color:var(--muted);margin:0;text-align:center}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1 1 200px;font-size:1.02rem;padding:12px 16px}
+.btn.small{padding:6px 12px;font-size:.88rem;font-weight:500}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+form{display:flex;flex-direction:column;gap:16px;min-width:0}
+fieldset{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);margin:0;padding:16px;display:grid;gap:12px;min-width:0}
+legend{font-weight:700;padding:0 6px;font-size:.98rem;display:flex;align-items:center;gap:8px}
+.num{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--sun);color:#1A1500;font-size:.85rem;font-weight:700}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:5px;font-size:.88rem;color:var(--muted);font-weight:500;min-width:0}
+input[type=text],textarea,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:80px;line-height:1.55}
+#msg{min-height:170px;unicode-bidi:plaintext}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);outline:none}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:center;background:var(--surface-2);cursor:pointer;color:var(--muted)}
+.drop.over{border-color:var(--accent);color:var(--ink)}
+.drop strong{color:var(--ink);display:block;font-size:1rem}
+.drop input{display:none}
+.range{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.status{font-size:.86rem;color:var(--muted);min-height:1.2em;margin:0}
+.status.err{color:var(--warn)}
+.found{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px;padding:0;list-style:none}
+.found li{font-size:.82rem;border-radius:999px;padding:2px 10px;background:var(--surface-2);border:1px solid var(--line)}
+.found li.miss{border-color:var(--warn);color:var(--warn)}
+details#manual{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+details#manual>summary{cursor:pointer;padding:14px 16px;font-weight:700;list-style-position:inside}
+.manual-body{display:grid;gap:12px;padding:0 16px 16px}
+#saveBox{position:fixed;inset:0;background:rgba(3,14,12,.84);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 16px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px));z-index:20;direction:rtl}
+#saveBox img{max-height:74vh;max-width:100%;border-radius:8px;background:#fff}
+#saveBox p{color:#fff;margin:0;text-align:center;font-weight:600}
+@media (max-width:860px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .preview{position:static;order:-1;max-width:420px;width:100%;margin:0 auto}
+}
+@media (max-width:420px){.row{grid-template-columns:minmax(0,1fr)}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>CV عاملات ترف</h1>
+      <p>الصق رسالة العاملة وارفع صورتها، والـ CV بتطلع جاهزة بتصميم ترف.</p>
+    </div>
+    <button class="btn small" type="button" id="resetBtn">CV جديدة (تفريغ الخانات)</button>
+  </header>
+
+  <div class="grid">
+    <form id="f" autocomplete="off">
+      <fieldset>
+        <legend><span class="num">1</span> الصق رسالة العاملة</legend>
+        <textarea id="msg" rows="8" dir="auto" placeholder="الاسم: بريكا&#10;العمر: 29&#10;غير مسلمة&#10;الجنسية: بوروندي&#10;أول مرة&#10;رقم الجواز: OP0301339"></textarea>
+        <div class="status" id="msgStatus" aria-live="polite">الصق الرسالة زي ما جاتلك، والبيانات هتتملي لوحدها.</div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="num">2</span> ارفع صورة العاملة</legend>
+        <label class="drop" id="drop" for="photo">
+          <strong>اضغط هنا وارفع الصورة</strong>
+          <span>أو اسحبها هنا، أو الصقها بـ Ctrl+V</span>
+          <input type="file" id="photo" accept="image/*">
+        </label>
+        <div class="range"><span>تكبير</span><input type="range" id="zoom" min="60" max="300" value="100"><span id="zoomVal">100%</span></div>
+        <p class="status" id="photoStatus">حرّك الصورة بإيدك جوه الدائرة عشان تظبط الوش في النص.</p>
+      </fieldset>
+
+      <details id="manual">
+        <summary>تعديل البيانات يدوي</summary>
+        <div class="manual-body">
+          <div class="row">
+            <label>الاسم<input type="text" id="name"></label>
+            <label>العمر<input type="text" id="age" inputmode="numeric"></label>
+          </div>
+          <div class="row">
+            <label>الديانة<input type="text" id="religion" list="relList"></label>
+            <label>الدولة<input type="text" id="country" list="natList"></label>
+          </div>
+          <label>رقم الجواز<input type="text" id="passport" dir="ltr" style="text-align:right"></label>
+          <label>النجمة<select id="badge"><option value="أول مرة">أول مرة</option><option value="خبرة سابقة">خبرة سابقة</option><option value="">من غير كلام</option></select></label>
+        </div>
+      </details>
+    </form>
+
+    <aside class="preview">
+      <div class="stage"><canvas id="cv" width="900" height="1600" aria-label="معاينة الـ CV"></canvas></div>
+      <p class="hint" id="hint">بيانات مثال — الصق رسالة العاملة وارفع صورتها</p>
+      <div class="actions">
+        <button class="btn primary" type="button" id="dlBtn">⬇ تحميل الصورة</button>
+        <button class="btn" type="button" id="copyBtn">نسخ</button>
+      </div>
+      <p class="status" id="dlStatus" aria-live="polite"></p>
+    </aside>
+  </div>
+</div>
+
+<div id="saveBox" hidden>
+  <img id="saveImg" alt="الـ CV الجاهزة">
+  <p>اضغط مطوّل على الصورة (أو كليك يمين) واختار حفظ الصورة</p>
+  <button class="btn" type="button" id="saveClose">رجوع</button>
+</div>
+
+<datalist id="relList"><option value="مسلمة"><option value="غير مسلمة"><option value="مسيحية"></datalist>
+<datalist id="natList"></datalist>
+
+<script>
+(() => {
+  const W = 900, H = 1600, FONT = "Tajawal";
+  const ASSET = window.ASSET_BASE || "";
+  // Template geometry (px in the 900×1600 design)
+  const CIRCLE = { cx: 450, cy: 574.5, r: 231.5 };
+  const FLAG = { cx: 370, cy: 1010, r: 28.5 };
+  const BADGE = { x: 560, y: 650, cx: 685, cy: 773 };
+  const INK = "#4D2134";
+
+  // [match, Arabic name shown, flag code]
+  const NAT = [
+    [/ethiop|اثيوب|إثيوب|حبش/i, "إثيوبيا", "et"], [/kenya|كيني/i, "كينيا", "ke"], [/uganda|اوغند|أوغند|يوغند/i, "أوغندا", "ug"],
+    [/philip|filip|pilip|فلبين|الفلبين/i, "الفلبين", "ph"], [/indonesia|اندونيس|إندونيس/i, "إندونيسيا", "id"],
+    [/sri\s*lank|srilank|سيريلانك|سريلانك|سيرلانك/i, "سريلانكا", "lk"], [/bangla|bengal|بنغلاد|بنجلاد|بنقلاد/i, "بنغلاديش", "bd"],
+    [/\bindia|هند/i, "الهند", "in"], [/burundi|بوروند/i, "بوروندي", "bi"], [/nepal|نيبال/i, "نيبال", "np"], [/ghana|غانا/i, "غانا", "gh"],
+    [/tanzan|تنزان/i, "تنزانيا", "tz"], [/sierra|سيراليون/i, "سيراليون", "sl"], [/rwanda|رواندا/i, "رواندا", "rw"],
+    [/pakistan|باكستان/i, "باكستان", "pk"], [/south\s*sudan|جنوب\s*السودان/i, "جنوب السودان", "ss"], [/sudan|سودان/i, "السودان", "sd"],
+    [/nigeria|نيجيري/i, "نيجيريا", "ng"], [/myanmar|burma|ميانمار|بورما/i, "ميانمار", "mm"], [/vietnam|فيتنام/i, "فيتنام", "vn"],
+    [/thai|تايلاند/i, "تايلاند", "th"], [/egypt|مصر/i, "مصر", "eg"], [/eritrea|ارتيري|إريتري|اريتري/i, "إريتريا", "er"],
+    [/somali|صومال/i, "الصومال", "so"], [/madagas|مدغشقر/i, "مدغشقر", "mg"], [/malawi|مالاوي|ملاوي/i, "مالاوي", "mw"],
+    [/zambia|زامبيا/i, "زامبيا", "zm"], [/cameroon|كاميرون/i, "الكاميرون", "cm"], [/morocc|المغرب/i, "المغرب", "ma"],
+    [/tunis|تونس/i, "تونس", "tn"], [/gambia|غامبيا/i, "غامبيا", "gm"], [/liberia|ليبيري/i, "ليبيريا", "lr"],
+    [/zimbab|زيمبابوي/i, "زيمبابوي", "zw"], [/\bmali\b|^مالي$/i, "مالي", "ml"], [/senegal|سنغال/i, "السنغال", "sn"],
+    [/\bchad\b|تشاد/i, "تشاد", "td"], [/\bniger\b|^النيجر$/i, "النيجر", "ne"], [/benin|بنين/i, "بنين", "bj"],
+    [/togo|توغو/i, "توغو", "tg"], [/ivory|cote|ساحل العاج/i, "ساحل العاج", "ci"], [/guinea|غينيا/i, "غينيا", "gn"]];
+
+  const $ = id => document.getElementById(id);
+  const cv = $("cv"), ctx = cv.getContext("2d");
+  const fields = ["name", "age", "religion", "country", "passport", "badge"];
+  const EXAMPLE = { name: "بريكا", age: "29", religion: "غير مسلمة", country: "بوروندي", passport: "OP0301339", badge: "أول مرة" };
+  const state = { photo: null, sample: null, zoom: 1, dx: 0, dy: 0, flags: {}, flagImgs: {} };
+  let template = null, badgeImg = null;
+
+  const loadImg = src => new Promise((res, rej) => { const i = new Image(); if (/^https?:/.test(src)) i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  const val = id => $(id).value.trim();
+  const toWestern = s => s.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+  const natFor = s => s ? NAT.find(([rx]) => rx.test(s)) : null;
+  $("natList").innerHTML = NAT.map(n => `<option value="${n[1]}">`).join("");
+
+  // ---------- drawing ----------
+  function setFont(size, weight = 700) { ctx.font = `${weight} ${size}px ${FONT}, Tahoma, sans-serif`; }
+  function fit(text, size, maxW, weight = 700) {
+    let s = size; setFont(s, weight);
+    while (ctx.measureText(text).width > maxW && s > 12) { s -= 1; setFont(s, weight); }
+    return s;
+  }
+  // centered text, ink centered vertically on cy
+  function textC(text, cx, cy, size, maxW, weight = 800, color = INK) {
+    if (!text) return;
+    fit(text, size, maxW, weight);
+    ctx.fillStyle = color; ctx.textAlign = "center"; ctx.direction = "rtl"; ctx.textBaseline = "alphabetic";
+    const m = ctx.measureText(text);
+    ctx.fillText(text, cx, cy + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);
+  }
+  function wrap(text, size, maxW, weight) {
+    setFont(size, weight);
+    const out = [];
+    for (const line of text.split(/\n+/).map(s => s.trim()).filter(Boolean)) {
+      if (ctx.measureText(line).width <= maxW) { out.push(line); continue; }
+      let cur = "";
+      for (const w of line.split(/\s+/)) {
+        const t = cur ? cur + " " + w : w;
+        if (ctx.measureText(t).width > maxW && cur) { out.push(cur); cur = w; } else cur = t;
+      }
+      if (cur) out.push(cur);
+    }
+    return out;
+  }
+
+  function placeFor(img) {
+    const d = CIRCLE.r * 2, k = Math.max(d / img.width, d / img.height);
+    const w = img.width * k, h = img.height * k;
+    // portraits: keep the head in view by sitting the photo slightly high
+    return { k, left: CIRCLE.cx - w / 2, top: CIRCLE.cy - CIRCLE.r - (h - d) * 0.18 };
+  }
+  function drawPhoto() {
+    const img = state.photo; if (!img) return;
+    const P = state.place || (state.place = placeFor(img));
+    const w0 = img.width * P.k, h0 = img.height * P.k, w = w0 * state.zoom, h = h0 * state.zoom;
+    const left = P.left + state.dx - (w - w0) / 2, top = P.top + state.dy - (h - h0) * 0.3;
+    ctx.save(); ctx.beginPath(); ctx.arc(CIRCLE.cx, CIRCLE.cy, CIRCLE.r, 0, Math.PI * 2); ctx.clip();
+    ctx.drawImage(img, left, top, w, h); ctx.restore();
+  }
+  function drawFlag(code) {
+    const { cx, cy, r } = FLAG;
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.closePath();
+    const img = code && state.flagImgs[code];
+    if (img) { ctx.clip(); ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2); }
+    else {
+      // unknown country: plain globe badge
+      ctx.fillStyle = "#5A1E44"; ctx.fill(); ctx.strokeStyle = "#FFD45A"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(cx, cy, r - 9, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(cx, cy, (r - 9) * 0.45, r - 9, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - (r - 9), cy); ctx.lineTo(cx + (r - 9), cy); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    if (template) ctx.drawImage(template, 0, 0, W, H); else { ctx.fillStyle = "#F3F5F5"; ctx.fillRect(0, 0, W, H); }
+    drawPhoto();
+
+    // starburst badge sits over the photo
+    if (badgeImg) ctx.drawImage(badgeImg, BADGE.x, BADGE.y);
+    const badge = $("badge").value;
+    if (badge) {
+      const parts = badge.split(/\s+/);
+      const lines = parts.length > 1 ? [parts[0], parts.slice(1).join(" ")] : [badge];
+      const size = 44, gap = 50, first = BADGE.cy - (lines.length - 1) * gap / 2;
+      lines.forEach((l, i) => textC(l, BADGE.cx, first + i * gap, size, 140, 800, "#FFFFFF"));
+    }
+
+    textC(val("name"), 581, 1019, 50, 170);
+    textC(normReligion(val("religion")), 594, 1155, 36, 185);
+    const nat = natFor(val("country"));
+    textC(val("country"), 250, 1020, 40, 170);
+    drawFlag(nat ? nat[2] : null);
+    const age = toWestern(val("age"));
+    textC(age ? (/سن|عام/.test(age) ? age : `${age} سنة`) : "", 269, 1151, 41, 175);
+    textC(val("passport").toUpperCase(), 398, 1305, 40, 210);
+  }
+
+  // مسلم / مسلمه / Muslim → مسلمة ، غير مسلم / Non Muslim → غير مسلمة
+  const normReligion = rel => /non|not|غير/i.test(rel) ? "غير مسلمة" : /christ|مسيح/i.test(rel) ? "مسيحية" : /musl|moslem|مسلم/i.test(rel) ? "مسلمة" : rel;
+
+  // ---------- read the worker message ----------
+  const INFO_WORDS = /جديد|خبر|تستطيع|تجيد|يجيد|طبخ|طباخ|نظاف|تنظيف|اطفال|أطفال|كبار|ترتيب|كوي|كي\b|غسيل|رعاية|سابق|عمل|تعمل|new|exp|clean|cook|baby|child|kid|iron|wash/i;
+  const SKILL_RX = [[/clean|house\s*keep/i, "التنظيف"], [/bab(y|ies|e)|child|kid|nanny/i, "رعاية الأطفال"], [/co+c?k|kook/i, "الطبخ"],
+    [/elder|old\s*(people|age)|senior/i, "رعاية كبار السن"], [/wash|laundr/i, "الغسيل"], [/iron/i, "الكي"], [/arrang|organi[sz]/i, "الترتيب"]];
+  const PLACES = [[/saudi|ksa|riyadh|jedd?ah/i, "في السعودية"], [/kuwait/i, "في الكويت"], [/uae|dubai|emirat/i, "في الإمارات"],
+    [/qatar/i, "في قطر"], [/oman/i, "في عمان"], [/bahrain/i, "في البحرين"], [/jordan/i, "في الأردن"], [/leban/i, "في لبنان"]];
+  const yearsAr = n => n === 1 ? "سنة" : n === 2 ? "سنتين" : (n >= 3 && n <= 10) ? `${n} سنوات` : `${n} سنة`;
+
+  function englishInfo(line) {
+    if (/[؀-ۿ]/.test(line)) return line; // Arabic stays as written
+    if (/\bnew\b|no\s*exp|fresh/i.test(line)) return "جديدة";
+    const y = line.match(/(\d+(?:\.\d+)?)\s*(y|yr|yrs|year|years)/i);
+    if (y || /\bex\b|exp|worked/i.test(line)) {
+      const pl = PLACES.find(([rx]) => rx.test(line));
+      return (y ? `خبرة ${yearsAr(Number(y[1]))}` : "خبرة سابقة") + (pl ? " " + pl[1] : "");
+    }
+    const hits = SKILL_RX.map(([rx, ar]) => { const m = line.match(rx); return m ? [m.index, ar] : null; }).filter(Boolean).sort((a, b) => a[0] - b[0]);
+    if (hits.length) return "تجيد: " + hits.map(h => h[1]).join(" - ");
+    return line;
+  }
+
+  function parseMessage(text) {
+    const lines = toWestern(text).replace(/\r/g, "").split(/\n+/).map(l => l.replace(/^[\s*•\-–]+|[\s*]+$/g, "")).filter(Boolean);
+    const KEY = /^(name|full\s*name|age|nationality|national|country|religion|passport(?:\s*no\.?)?|pass(?:port)?\s*no\.?|الاسم|الإسم|اسم|العمر|السن|الجنسية|الجنسيه|الدولة|الدوله|الديانة|الديانه|الدين|رقم\s*الجواز|الجواز|جواز|ملاحظات|معلومات(?:\s*إضافية)?|الخبرة|الخبره|المهارات)(?=[\s:：=\-–]|$)\s*[:：=\-–]?\s*(.*)$/i;
+    const out = { info: [] };
+    const all = toWestern(text);
+    for (const line of lines) {
+      const m = line.match(KEY);
+      if (m && m[2]) {
+        const k = m[1].toLowerCase(), v = m[2].trim();
+        if (/name|اسم|الإسم/.test(k)) { out.name = v; continue; }
+        if (/age|العمر|السن/.test(k)) { out.age = (v.match(/\d{2}/) || [v])[0]; continue; }
+        if (/nation|country|الجنسي|الدول/.test(k)) { out.countryRaw = v; continue; }
+        if (/relig|ديان|الدين/.test(k)) { out.religionRaw = v; continue; }
+        if (/pass|جواز/.test(k)) { out.passport = v.replace(/\s+/g, "").toUpperCase(); continue; }
+        out.info.push(englishInfo(v)); continue;
+      }
+      if (!out.religionRaw && /^(non[\s\-]*muslim|not\s*muslim|muslim|moslem|christian|غير\s*مسلم[ةه]?|مسلم[ةه]?|مسيحي[ةه]?)$/i.test(line)) { out.religionRaw = line; continue; }
+      if (!out.countryRaw && line.split(/\s+/).length <= 3 && natFor(line)) { out.countryRaw = line; continue; }
+      if (!out.passport && /^[A-Z]{1,3}\s?\d{6,9}$/i.test(line)) { out.passport = line.replace(/\s+/g, "").toUpperCase(); continue; }
+      if (!out.age && /^(1[89]|[2-5]\d)\s*(سنة|سنه|عام|years?|y\/?o)?$/i.test(line)) { out.age = line.match(/\d+/)[0]; continue; }
+      if (!out.name && !INFO_WORDS.test(line) && line.split(/\s+/).length <= 3 && !/\d/.test(line)) { out.name = line; continue; }
+      out.info.push(englishInfo(line));
+    }
+    out.religion = normReligion(out.religionRaw || "");
+    out.badge = /\bnew\b|fresh|first\s*time|no\s*exp|جديد|أول\s*مر|اول\s*مر|بدون\s*خبر/i.test(all) ? "أول مرة"
+      : /\bex\b|exp|worked|\d\s*(y|yrs?|years?)\b|خبر|سابق/i.test(all) ? "خبرة سابقة" : "";
+    const nat = natFor(out.countryRaw || "");
+    out.country = nat ? nat[1] : (out.countryRaw || "");
+    if (out.name && /^[\x00-\x7F]+$/.test(out.name)) out.name = out.name.toUpperCase();
+    return out;
+  }
+  function showFound(r) {
+    const st = $("msgStatus"); st.textContent = "";
+    if (!r) { st.textContent = "الصق الرسالة زي ما جاتلك، والبيانات هتتملي لوحدها."; return; }
+    const items = [["الاسم", r.name], ["العمر", r.age], ["الديانة", r.religion], ["الدولة", r.country], ["رقم الجواز", r.passport], ["النجمة (أول مرة / خبرة)", r.badge]];
+    const ul = document.createElement("ul"); ul.className = "found";
+    items.forEach(([k, v]) => { const li = document.createElement("li"); li.textContent = v ? `✓ ${k}` : `✗ ${k} مش لاقيه`; if (!v) li.className = "miss"; ul.appendChild(li); });
+    st.appendChild(ul);
+    if (r.country && !natFor(r.country)) { const s = document.createElement("span"); s.textContent = "الدولة دي مش في قايمة الأعلام، فهيظهر مكان العلم رمز عام. "; st.appendChild(s); }
+    if (items.some(i => !i[1])) { const s = document.createElement("span"); s.textContent = "اللي ناقص اكتبه من «تعديل البيانات يدوي» تحت."; st.appendChild(s); }
+  }
+  let msgTimer = null;
+  $("msg").addEventListener("input", e => {
+    e.stopPropagation(); clearTimeout(msgTimer);
+    msgTimer = setTimeout(() => {
+      const txt = $("msg").value.trim();
+      if (!txt) { showFound(null); return; }
+      const r = parseMessage(txt);
+      $("name").value = r.name || ""; $("age").value = r.age || ""; $("religion").value = r.religion || "";
+      $("country").value = r.country || ""; $("passport").value = r.passport || ""; if (r.badge) $("badge").value = r.badge;
+      if (state.photo === state.sample) setPhoto(null);
+      $("hint").textContent = state.photo ? "حرّك الصورة بإيدك لو محتاجة تظبيط" : "فاضل صورة العاملة";
+      showFound(r); draw();
+    }, 250);
+  });
+  $("f").addEventListener("submit", e => e.preventDefault());
+  $("badge").addEventListener("change", draw);
+  $("f").addEventListener("input", e => { if (e.target.id !== "msg" && e.target.type !== "file" && e.target.type !== "range") draw(); });
+
+  // ---------- photo ----------
+  function setPhoto(img) {
+    state.photo = img; state.place = img ? placeFor(img) : null;
+    state.zoom = 1; state.dx = 0; state.dy = 0; $("zoom").value = 100; $("zoomVal").textContent = "100%";
+  }
+  async function usePhoto(file) {
+    if (!file || !/^image\//.test(file.type)) { flash($("photoStatus"), "الملف ده مش صورة — ارفع JPG أو PNG", true); return; }
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await loadImg(url);
+      const k = Math.min(1, 1200 / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement("canvas"); c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      setPhoto(c); draw();
+      flash($("photoStatus"), "الصورة اتحطت ✓ — حرّكها بإيدك لو الوش مش في النص");
+      $("hint").textContent = "حرّك الصورة بإيدك لو محتاجة تظبيط";
+    } catch { flash($("photoStatus"), "مش قادر أفتح الصورة دي — جرّب صورة تانية", true); }
+    finally { URL.revokeObjectURL(url); }
+  }
+  $("photo").addEventListener("change", e => usePhoto(e.target.files[0]));
+  const drop = $("drop");
+  ["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", e => usePhoto(e.dataTransfer.files[0]));
+  document.addEventListener("paste", e => { const f = [...(e.clipboardData?.files || [])].find(f => /^image\//.test(f.type)); if (f) usePhoto(f); });
+  $("zoom").addEventListener("input", () => { state.zoom = $("zoom").value / 100; $("zoomVal").textContent = $("zoom").value + "%"; draw(); });
+
+  let drag = null;
+  cv.addEventListener("pointerdown", e => {
+    if (!state.photo) return;
+    drag = { x: e.clientX, y: e.clientY, dx: state.dx, dy: state.dy, k: W / cv.getBoundingClientRect().width };
+    cv.setPointerCapture(e.pointerId); cv.classList.add("drag");
+  });
+  cv.addEventListener("pointermove", e => {
+    if (!drag) return;
+    state.dx = drag.dx + (e.clientX - drag.x) * drag.k; state.dy = drag.dy + (e.clientY - drag.y) * drag.k;
+    requestAnimationFrame(draw);
+  });
+  const endDrag = () => { drag = null; cv.classList.remove("drag"); };
+  cv.addEventListener("pointerup", endDrag); cv.addEventListener("pointercancel", endDrag);
+  cv.addEventListener("wheel", e => {
+    if (!state.photo) return; e.preventDefault();
+    const z = Math.min(300, Math.max(60, Number($("zoom").value) - Math.sign(e.deltaY) * 5));
+    $("zoom").value = z; $("zoom").dispatchEvent(new Event("input"));
+  }, { passive: false });
+
+  $("resetBtn").onclick = () => {
+    fields.forEach(k => $(k).value = ""); $("badge").value = "أول مرة"; $("msg").value = ""; showFound(null);
+    setPhoto(null); $("photo").value = ""; $("hint").textContent = "الصق رسالة العاملة وارفع صورتها"; draw();
+  };
+
+  // ---------- export ----------
+  function flash(el, msg, err = false) { el.textContent = msg; el.className = "status" + (err ? " err" : ""); }
+  const fileName = () => "CV-" + (val("name") || "worker").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") + ".png";
+  const getBlob = () => new Promise(r => { draw(); cv.toBlob(r, "image/png"); });
+  function showSaveBox() { draw(); $("saveImg").src = cv.toDataURL("image/png"); $("saveBox").hidden = false; }
+  $("saveClose").onclick = () => $("saveBox").hidden = true;
+  $("dlBtn").onclick = async () => {
+    if (state.photo === state.sample) flash($("dlStatus"), "تنبيه: لسه صورة المثال — اتأكد إنك رفعت صورة العاملة", true);
+    const blob = await getBlob();
+    let downloads = null;
+    try { downloads = await window.claude?.use?.("downloads"); } catch {}
+    if (!downloads) {
+      try {
+        const u = URL.createObjectURL(blob), a = document.createElement("a");
+        a.href = u; a.download = fileName(); document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(u), 4000);
+        flash($("dlStatus"), "اتحملت ✓");
+      } catch { showSaveBox(); }
+      return;
+    }
+    try { await downloads.save({ filename: fileName(), data: blob }); flash($("dlStatus"), "اتحفظت ✓"); }
+    catch (e) {
+      if (e && e.code === "declined") flash($("dlStatus"), "التحميل اتلغى");
+      else if (e && e.code === "rate_limited") flash($("dlStatus"), "استنى ثانية وجرّب تاني", true);
+      else showSaveBox();
+    }
+  };
+  $("copyBtn").onclick = async () => {
+    try { const blob = await getBlob(); await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); flash($("dlStatus"), "اتنسخت ✓ — الصقها في واتساب على طول"); }
+    catch { showSaveBox(); }
+  };
+
+  // ---------- boot ----------
+  fields.forEach(k => $(k).value = EXAMPLE[k]);
+  draw();
+  Promise.all([
+    loadImg(ASSET + "template.jpg").then(i => template = i).catch(() => {}),
+    loadImg(ASSET + "badge.png").then(i => badgeImg = i).catch(() => {}),
+    loadImg(ASSET + "sample.jpg").then(i => { state.sample = i; if (!state.photo && !val("msg")) setPhoto(i); }).catch(() => {}),
+    fetch(ASSET + "flags.json").then(r => r.json()).then(async f => {
+      state.flags = f;
+      await Promise.all(Object.entries(f).map(([c, src]) => loadImg(src).then(i => state.flagImgs[c] = i).catch(() => {})));
+    }).catch(() => {}),
+    document.fonts.load(`700 30px ${FONT}`, "عربي").then(() => Promise.all([document.fonts.load(`700 30px ${FONT}`, "AB12"), document.fonts.load(`800 30px ${FONT}`, "عربي"), document.fonts.load(`800 30px ${FONT}`, "AB12")])).catch(() => {})
+  ]).then(draw);
+  document.fonts.ready.then(draw);
+})();
+</script>
+
+</body>
+</html>

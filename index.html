@@ -155,9 +155,9 @@ details#manual>summary{cursor:pointer;padding:14px 16px;font-weight:700;list-sty
 
   // [match, Arabic name shown, flag code]
   const NAT = [
-    [/ethiop|اثيوب|إثيوب|حبش/i, "إثيوبيا", "et"], [/kenya|كيني/i, "كينيا", "ke"], [/uganda|اوغند|أوغند|يوغند/i, "أوغندا", "ug"],
-    [/philip|filip|pilip|فلبين|الفلبين/i, "الفلبين", "ph"], [/indonesia|اندونيس|إندونيس/i, "إندونيسيا", "id"],
-    [/sri\s*lank|srilank|سيريلانك|سريلانك|سيرلانك/i, "سريلانكا", "lk"], [/bangla|bengal|بنغلاد|بنجلاد|بنقلاد/i, "بنغلاديش", "bd"],
+    [/eth?i?op|اثيوب|إثيوب|حبش/i, "إثيوبيا", "et"], [/ken[yi]a|كيني/i, "كينيا", "ke"], [/ugand|اوغند|أوغند|يوغند/i, "أوغندا", "ug"],
+    [/phil+i?p|fil+ip|pilip|فلبين/i, "الفلبين", "ph"], [/indon|اندونيس|إندونيس/i, "إندونيسيا", "id"],
+    [/sri\s*lan|srilan|سيريلانك|سريلانك|سيرلانك/i, "سريلانكا", "lk"], [/bangla|bengal|bangal|بنغلاد|بنجلاد|بنقلاد/i, "بنغلاديش", "bd"],
     [/\bindia|هند/i, "الهند", "in"], [/burundi|بوروند/i, "بوروندي", "bi"], [/nepal|نيبال/i, "نيبال", "np"], [/ghana|غانا/i, "غانا", "gh"],
     [/tanzan|تنزان/i, "تنزانيا", "tz"], [/sierra|سيراليون/i, "سيراليون", "sl"], [/rwanda|رواندا/i, "رواندا", "rw"],
     [/pakistan|باكستان/i, "باكستان", "pk"], [/south\s*sudan|جنوب\s*السودان/i, "جنوب السودان", "ss"], [/sudan|سودان/i, "السودان", "sd"],
@@ -268,7 +268,11 @@ details#manual>summary{cursor:pointer;padding:14px 16px;font-weight:700;list-sty
   }
 
   // مسلم / مسلمه / Muslim → مسلمة ، غير مسلم / Non Muslim → غير مسلمة
-  const normReligion = rel => /non|not|غير/i.test(rel) ? "غير مسلمة" : /christ|مسيح/i.test(rel) ? "مسيحية" : /musl|moslem|مسلم/i.test(rel) ? "مسلمة" : rel;
+  // religion — negation first: None/Non/Not/No Muslim, غير/ليست/مش مسلمة, or another religion
+  const NOT_MUSLIM = /(?:\b(?:non|none|not|no|un)[\s\-_.]*(?:a\s+)?(?:musl|moslem|islam))|(?:غير|ليست|ليس|مش|مو|لا)\s*(?:مسلم|اسلام|إسلام)/i;
+  const OTHER_REL = /christ|catholic|protestant|orthodox|hindu|budd|sikh|مسيح|كاثوليك|بروتستان|ارثوذكس|أرثوذكس|هندوس|بوذ|سيخ/i;
+  const IS_MUSLIM = /musl|moslem|islam|مسلم|اسلام|إسلام/i;
+  const normReligion = rel => NOT_MUSLIM.test(rel) ? "غير مسلمة" : /christ|catholic|protestant|orthodox|مسيح|كاثوليك|بروتستان|ارثوذكس|أرثوذكس/i.test(rel) ? "مسيحية" : OTHER_REL.test(rel) ? "غير مسلمة" : IS_MUSLIM.test(rel) ? "مسلمة" : rel;
 
   // ---------- read the worker message ----------
   const INFO_WORDS = /جديد|خبر|تستطيع|تجيد|يجيد|طبخ|طباخ|نظاف|تنظيف|اطفال|أطفال|كبار|ترتيب|كوي|كي\b|غسيل|رعاية|سابق|عمل|تعمل|new|exp|clean|cook|baby|child|kid|iron|wash/i;
@@ -307,7 +311,7 @@ details#manual>summary{cursor:pointer;padding:14px 16px;font-weight:700;list-sty
         if (/pass|جواز/.test(k)) { out.passport = v.replace(/\s+/g, "").toUpperCase(); continue; }
         out.info.push(englishInfo(v)); continue;
       }
-      if (!out.religionRaw && /^(non[\s\-]*muslim|not\s*muslim|muslim|moslem|christian|غير\s*مسلم[ةه]?|مسلم[ةه]?|مسيحي[ةه]?)$/i.test(line)) { out.religionRaw = line; continue; }
+      if (!out.religionRaw && line.split(/\s+/).length <= 4 && !/\d/.test(line) && (NOT_MUSLIM.test(line) || OTHER_REL.test(line) || IS_MUSLIM.test(line))) { out.religionRaw = line; continue; }
       if (!out.countryRaw && line.split(/\s+/).length <= 3 && natFor(line)) { out.countryRaw = line; continue; }
       if (!out.passport && /^[A-Z]{1,3}\s?\d{6,9}$/i.test(line)) { out.passport = line.replace(/\s+/g, "").toUpperCase(); continue; }
       if (!out.age && /^(1[89]|[2-5]\d)\s*(سنة|سنه|عام|years?|y\/?o)?$/i.test(line)) { out.age = line.match(/\d+/)[0]; continue; }
